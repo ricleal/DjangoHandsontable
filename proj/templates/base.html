@@ -1,0 +1,46 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Ricardo's Handsontable Demo</title>
+  <!-- FONT
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+  <!-- CSS
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+  <!--link rel="stylesheet" href="{% static "jQueryFileTree.min.css" %}"-->
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/atelier-cave.light.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.20.3/handsontable.full.min.css"
+rel="stylesheet">
+  <!-- Favicon
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</head>
+<body>
+
+
+  {% block content %}
+  {% endblock %}
+
+
+
+  <!-- JS
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!--script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.20.3/handsontable.full.min.js"></script>
+  {% block body_end %}
+  {% endblock %}
+
+
+
+  <!-- End Document
+	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Data list</h1>
+<ul>
+{% for item in object_list %}
+    <li>{{item}}</li>
+{% empty %}
+    <li>No Data yet.</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

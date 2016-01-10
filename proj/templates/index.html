@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+  <h1>Handsontable example</h1>
+
+  <div class="row">
+      <div class="col-sm-10">
+        <div id="entries"></div>
+      </div>
+  </div>
+  <div class="row">
+      <div class="col-sm-10">
+        <button class="btn btn-default" id="button_post_table">Post table</a>
+      </div>
+  </div>
+  <div class="row">
+      <div class="col-sm-10">
+        <hr/>
+      </div>
+  </div>
+  <div class="row">
+      <div class="col-sm-10">
+        <div id="messages"></div>
+      </div>
+  </div>
+
+</div>
+
+
+{% endblock %}
+
+{% block body_end %}
+<script type="text/javascript">
+
+  // Action for the table button
+  $('#button_post_table').on('click', function(event) {
+    event.preventDefault(); // To prevent following the link (optional)
+    post_table();
+  });
+
+  // Initial data for the table
+  var data = [
+    [, , , ]
+  ];
+
+  var container = document.getElementById('entries');
+  var hot = new Handsontable(container, {
+    data: data,
+    height: 300,
+    minSpareRows: 10,
+    stretchH: 'all',
+    columnSorting: true,
+    contextMenu: true,
+    autoWrapRow: true,
+    rowHeaders: false,
+    colHeaders: ["Entry", "Sample", "Background"],
+    contextMenu: true
+  });
+
+  function post_table() {
+    var data_to_post = {
+      table_content : JSON.stringify(hot.getData()),
+      csrfmiddlewaretoken: '{{ csrf_token }}'
+    };
+    console.log(data_to_post);
+    $.ajax({
+      type: "POST",
+      url: "{% url 'app1:create' %}",
+      data : data_to_post,
+      success: function(data) {
+          console.log(data);
+          $( "#messages div" ).remove();
+          $( "#messages" ).append( "<div class='alert alert-success'><strong>Success!</strong>" +data + "</div>" );
+      },
+      failure: function(data) {
+          $( "#messages div" ).remove();
+          $( "#messages" ).append( "<div class='alert alert-danger'><strong>Error!</strong>" +data + "</div>" );
+      }
+    });
+  }
+</script>
+{% endblock %}
