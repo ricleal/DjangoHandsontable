@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^list/$', views.DataListView.as_view(), name='list'),
     url(r'^create/$', views.create_data_ajax, name='create'),
+    url(r'^form/$', views.DataFormView.as_view(), name='form'),
 ]

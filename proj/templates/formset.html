@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+
+    <h1>Handsontable example: Formset</h1>
+    <form method="post" action="" onsubmit="return set_form_hidden_fields();" id="form_table">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        {% for form in formset %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+        {% endfor %}
+
+        <div class="row">
+            <div class="col-sm-10">
+                <div id="entries"></div>
+            </div>
+        </div>
+        <div class="row">
+            <hr/>
+        </div>
+        <div class="row">
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary" id="button_submit_table">Update</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+{% endblock %}
+
+{% block body_end %}
+<script type="text/javascript">
+
+    // Initial data for the table
+    var headers = new Array();
+    var data  = new Array();
+    {% for form in formset %}
+        var row  = new Array();
+        {% if forloop.first %}
+            {% for field in form %}
+                if ('{{field.label}}' != 'Id'){
+                    headers.push('{{field.label}}');
+                };
+            {% endfor %}
+        {% endif %}
+        {% for field in form %}
+            {% if field.value %}
+                if ('{{field.label}}' != 'Id'){
+                    row.push('{{field.value}}');
+                };
+            {% endif %}
+        {% endfor %}
+        data.push(row);
+    {% endfor %}
+    console.log(headers);
+    console.log(data);
+
+    // Save data in the form
+    function set_form_hidden_fields() {
+        var new_data = hot.getData();
+        for(var i = 0; i < new_data.length; i++) {
+            var row = new_data[i];
+            for(var j = 0; j < row.length; j++) {
+                if (row[0] != '') {
+                    var input_id = "id_{{formset.prefix}}-" + i + "-" + headers[j].toLowerCase();
+                    console.log(input_id);
+                    $('#form_table').append('<input id="' + input_id + '" name="' + input_id + '" type="hidden" value="' + row[j] +'" />');
+                }
+            }
+            // input_id = "id_{{formset.prefix}}-" + i + "-id";
+            // console.log(input_id);
+            // $('#form_table').append('<input id="' + input_id + '" name="' + input_id + '" type="hidden" value="' + row[j] +'" />');
+        }
+
+    	// document.getElementById('entries_hidden').value = JSON.stringify({entries_hidden: hot.getData()});
+
+        console.log($('#form_table'));
+        return true;
+     }
+
+    var container = document.getElementById('entries');
+    var hot = new Handsontable(container, {
+        data: data,
+        height: 300,
+        minSpareRows: 1,
+        stretchH: 'all',
+        columnSorting: true,
+        contextMenu: true,
+        autoWrapRow: true,
+        rowHeaders: false,
+        colHeaders: headers,
+        contextMenu: true
+    });
+
+
+</script>
+{% endblock %}

@@ -10,3 +10,9 @@ For the handsontable documents see http://handsontable.com/.
 
 Home: http://localhost:8000/app1/
 List created entries: http://localhost:8000/app1/list/
+
+## Dependencies:
+
+```
+pip install django-extra-views
+```

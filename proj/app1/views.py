@@ -1,8 +1,12 @@
 # app1/views.py
 from django.views.generic import TemplateView,  ListView, DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, FormView
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.forms import modelformset_factory
+from extra_views import FormSetView, ModelFormSetView
+from django.core.urlresolvers import reverse_lazy
+from pprint import pprint
 
 import json
 
@@ -14,6 +18,27 @@ class IndexView(TemplateView):
 class DataListView(ListView):
     model = Data
     fields = '__all__'
+
+class DataFormView(ModelFormSetView):
+    #form_class = modelformset_factory(Data, fields='__all__', extra=5)
+    model = Data
+    template_name = 'formset.html'
+    prefix = "table"
+    success_url = reverse_lazy('app1:list')
+
+    def post(self, request, *args, **kwargs):
+        pprint(dict(self.request.POST))
+        return super(DataFormView, self).post(request, *args, **kwargs)
+
+    def formset_valid(self, formset):
+        print "FORM VALID"
+        return super(DataFormView, self).formset_valid(formset)
+
+    def formset_invalid(self, formset):
+        print "FORM INNNNNVALID"
+        pprint(formset)
+        return super(DataFormView, self).formset_invalid(formset)
+
 
 def create_data_ajax(request):
     data = request.POST['table_content']
