@@ -4,12 +4,15 @@
 <div class="container">
 
     <h1>Handsontable example: Formset</h1>
-    <form method="post" action="" onsubmit="return set_form_hidden_fields();" id="form_table">
+    <form id="form_table" method="post" action="" onsubmit="return set_form_fields();">
         {% csrf_token %}
         {{ formset.management_form }}
         {% for form in formset %}
             {% for hidden in form.hidden_fields %}
                 {{ hidden }}
+            {% endfor %}
+            {% for field in form %}
+                {{ field.label }} {{ field.errors }}
             {% endfor %}
         {% endfor %}
 
@@ -61,25 +64,18 @@
     console.log(data);
 
     // Save data in the form
-    function set_form_hidden_fields() {
+    // Transforms Handsontable format into django formset
+    function set_form_fields() {
         var new_data = hot.getData();
         for(var i = 0; i < new_data.length; i++) {
             var row = new_data[i];
             for(var j = 0; j < row.length; j++) {
-                if (row[0] != '') {
-                    var input_id = "id_{{formset.prefix}}-" + i + "-" + headers[j].toLowerCase();
-                    console.log(input_id);
+                if (row[0] != null) {
+                    var input_id = "{{formset.prefix}}-" + i + "-" + headers[j].toLowerCase();
                     $('#form_table').append('<input id="' + input_id + '" name="' + input_id + '" type="hidden" value="' + row[j] +'" />');
                 }
             }
-            // input_id = "id_{{formset.prefix}}-" + i + "-id";
-            // console.log(input_id);
-            // $('#form_table').append('<input id="' + input_id + '" name="' + input_id + '" type="hidden" value="' + row[j] +'" />');
         }
-
-    	// document.getElementById('entries_hidden').value = JSON.stringify({entries_hidden: hot.getData()});
-
-        console.log($('#form_table'));
         return true;
      }
 
