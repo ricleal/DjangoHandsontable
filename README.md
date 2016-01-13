@@ -21,3 +21,7 @@ Home: http://localhost:8000/app1/form/ --> formset.html
 ```
 pip install django-extra-views
 ```
+
+## Inline Formset
+
+Uses models: Reduction has several Entries

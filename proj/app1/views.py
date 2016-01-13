@@ -11,7 +11,7 @@ import collections
 
 import json
 
-from .models import Data
+from .models import Data, Reduction, Entry
 
 class IndexView(TemplateView):
     template_name = "index.html"
@@ -20,14 +20,31 @@ class DataListView(ListView):
     model = Data
     fields = '__all__'
 
+def create_data_ajax(request):
+    '''
+    Deals with the ajax request
+    '''
+    data = request.POST['table_content']
+    data = json.loads(data)
+    try:
+        for row in data:
+            if all(x for x in row): # All not None!
+                entry = Data.objects.create_entry(row[0],row[1],row[2])
+        return HttpResponse("Updated")
+    except Exception, e:
+        return HttpResponse("Error: %s"%e)
+
 class DataFormView(ModelFormSetView):
-    #form_class = modelformset_factory(Data, fields='__all__', extra=5)
+    '''
+    Deals with the formset request
+    '''
     model = Data
     template_name = 'formset.html'
     prefix = "table"
     can_delete = True
     success_url = reverse_lazy('app1:list')
 
+    # The functions below are just for debug!
     def post(self, request, *args, **kwargs):
         od = collections.OrderedDict(sorted(dict(self.request.POST).items()))
         pprint(dict(od))
@@ -42,14 +59,44 @@ class DataFormView(ModelFormSetView):
         pprint(formset.errors)
         return super(DataFormView, self).formset_invalid(formset)
 
+#
+# For inline formsets
+# Reduction has many Entries
+#
 
-def create_data_ajax(request):
-    data = request.POST['table_content']
-    data = json.loads(data)
-    try:
-        for row in data:
-            if all(x for x in row): # All not None!
-                entry = Data.objects.create_entry(row[0],row[1],row[2])
-        return HttpResponse("Updated")
-    except Exception, e:
-        return HttpResponse("Error: %s"%e)
+from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSet
+
+class ReductionInline(InlineFormSet):
+    model = Entry
+    prefix = "table"
+
+class CreateReductionView(CreateWithInlinesView):
+    model = Reduction
+    inlines = [ReductionInline]
+    template_name = 'reduction_formset.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super(CreateReductionView, self).get_context_data(**kwargs)
+        pprint(ctx)
+        return ctx
+    # The functions below are just for debug!
+    def post(self, request, *args, **kwargs):
+        od = collections.OrderedDict(sorted(dict(self.request.POST).items()))
+        pprint(dict(od))
+        return super(CreateReductionView, self).post(request, *args, **kwargs)
+
+    def forms_valid(self,  form, inlines):
+        print "FORMs VALID"
+        return super(CreateReductionView, self).forms_valid(form, inlines)
+
+    def forms_invalid(self,  form, inlines):
+        print "FORMs INNNNNVALID"
+        pprint(form.errors)
+        for formset in inlines:
+            pprint(formset.errors)
+        return super(CreateReductionView, self).forms_invalid(form, inlines)
+
+class UpdateReductionView(UpdateWithInlinesView):
+    model = Reduction
+    inlines = [ReductionInline]
+    template_name = 'reduction_formset.html'
