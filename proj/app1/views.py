@@ -7,6 +7,7 @@ from django.forms import modelformset_factory
 from extra_views import FormSetView, ModelFormSetView
 from django.core.urlresolvers import reverse_lazy
 from pprint import pprint
+import collections
 
 import json
 
@@ -24,10 +25,12 @@ class DataFormView(ModelFormSetView):
     model = Data
     template_name = 'formset.html'
     prefix = "table"
+    can_delete = True
     success_url = reverse_lazy('app1:list')
 
     def post(self, request, *args, **kwargs):
-        pprint(dict(self.request.POST))
+        od = collections.OrderedDict(sorted(dict(self.request.POST).items()))
+        pprint(dict(od))
         return super(DataFormView, self).post(request, *args, **kwargs)
 
     def formset_valid(self, formset):
@@ -36,7 +39,7 @@ class DataFormView(ModelFormSetView):
 
     def formset_invalid(self, formset):
         print "FORM INNNNNVALID"
-        pprint(formset)
+        pprint(formset.errors)
         return super(DataFormView, self).formset_invalid(formset)
 
 

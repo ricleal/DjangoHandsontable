@@ -7,21 +7,23 @@
     <form id="form_table" method="post" action="" onsubmit="return set_form_fields();">
         {% csrf_token %}
         {{ formset.management_form }}
-        {% for form in formset %}
-            {% for hidden in form.hidden_fields %}
-                {{ hidden }}
-            {% endfor %}
-            {% for field in form %}
-                {{ field.label }} {{ field.errors }}
-            {% endfor %}
-        {% endfor %}
-
         <div class="row">
             <div class="col-sm-10">
                 <div id="entries"></div>
             </div>
         </div>
         <div class="row">
+            <hr/>
+            {% if formset.errors %}
+            {% for form in formset %}
+                {% if form.errors %}
+                <div class="alert alert-danger" role="alert">
+                       {{ form.non_field_errors }}
+                       {{ form.errors }}
+                </div>
+                {% endif %}
+            {% endfor %}
+            {% endif %}
             <hr/>
         </div>
         <div class="row">
@@ -41,41 +43,70 @@
 
     // Initial data for the table
     var headers = new Array();
+    var primary_keys = new Array();
     var data  = new Array();
+
     {% for form in formset %}
         var row  = new Array();
         {% if forloop.first %}
             {% for field in form %}
-                if ('{{field.label}}' != 'Id'){
+                if ('{{field.label}}' != 'Id' && '{{field.label}}' != 'Delete'){
                     headers.push('{{field.label}}');
                 };
             {% endfor %}
         {% endif %}
         {% for field in form %}
+            var value = '';
             {% if field.value %}
-                if ('{{field.label}}' != 'Id'){
-                    row.push('{{field.value}}');
-                };
+                value = '{{field.value}}';
             {% endif %}
+            if ('{{field.label}}' != 'Id' && '{{field.label}}' != 'Delete'){
+                row.push(value);
+            }
+            else if ('{{field.label}}' == 'Id') {
+                primary_keys.push('{{ field.value }}');
+            };
         {% endfor %}
         data.push(row);
     {% endfor %}
-    console.log(headers);
-    console.log(data);
 
+    // Check if an array has inly nulls inside
+    Array.prototype.isNull = function (){
+        return this.join().replace(/,/g,'').length === 0;
+    };
     // Save data in the form
     // Transforms Handsontable format into django formset
+    var total_non_empty_rows = 0;
     function set_form_fields() {
         var new_data = hot.getData();
         for(var i = 0; i < new_data.length; i++) {
             var row = new_data[i];
-            for(var j = 0; j < row.length; j++) {
-                if (row[0] != null) {
+            var pk = '';
+            // Add Primary key
+            if (i < primary_keys.length){
+                pk = primary_keys[i]
+            }
+            // If exists add primary key, otherwise add ''
+            var input_id = "{{formset.prefix}}-" + i + "-id";
+            $('#form_table').append('<input id="id_' + input_id + '" name="' + input_id + '" type="hidden" value="' + pk +'" />');
+
+            // If row is empty set it to be deleted
+            if (row.isNull()){
+                var input_id = "{{formset.prefix}}-" + i + "-DELETE";
+                $('#form_table').append('<input id="id_' + input_id + '" name="' + input_id + '" type="hidden" value="on" />');
+            }
+            // Add data fields
+            else {
+                for(var j = 0; j < row.length; j++) {
                     var input_id = "{{formset.prefix}}-" + i + "-" + headers[j].toLowerCase();
-                    $('#form_table').append('<input id="' + input_id + '" name="' + input_id + '" type="hidden" value="' + row[j] +'" />');
+                    $('#form_table').append('<input id="id_' + input_id + '" name="' + input_id + '" type="hidden" value="' + row[j] +'" />');
                 }
+                total_non_empty_rows+=1;
             }
         }
+        // Set total of forms as many elements the table has
+        var input_id = "id_{{formset.prefix}}-TOTAL_FORMS";
+        $('#'+input_id).val(total_non_empty_rows);
         return true;
      }
 

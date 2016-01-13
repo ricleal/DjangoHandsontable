@@ -1,25 +1,22 @@
 # DjangoHandsontable
 
-Example using Django and handsontable with Ajax query and Formsets.
-
 Validates `csrf_token`.
 
 For the handsontable documents see http://handsontable.com/.
 
-## Views:
+Several versions.
 
-### Ajax
+## Ajax:
+Example using Django and handsontable with Ajax
 
-Home: http://localhost:8000/app1/
+Home: http://localhost:8000/app1/ --> index.html
 List created entries: http://localhost:8000/app1/list/
 
-### Formset
+## Formset
 
-http://localhost:8000/app1/form/
+Home: http://localhost:8000/app1/form/ --> formset.html
 
-
-
-## Dependencies (for formsets):
+**Dependencies (for formsets):**
 
 ```
 pip install django-extra-views
